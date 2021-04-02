@@ -1,0 +1,51 @@
+---
+title: "Interesting Forecasting Applications with R"
+author: "Umut Mustafa Dilsiz - IE 360 - Spring 2021 "
+date: "02 04 2021"
+output: html_document
+---
+
+```{r,echo=FALSE,results="hide"}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+```{r,echo=FALSE,eval=FALSE}
+rmarkdown::render("/home/baydogan/Courses/IE360/Guidelines/example_homework_0.Rmd",output_format="pdf_document")
+rmarkdown::render("/home/baydogan/Courses/IE360/Guidelines/example_homework_0.Rmd",output_format="html_document")
+```
+
+1.[Time series forecasting using ARIMA models](https://blogs.oracle.com/datascience/introduction-to-forecasting-with-arima-in-r)
+
+ This example is important because it introduces the forecasting methodology using ARIMA models in R. The steps are 
+    
+  * Examining Your Data
+  * Loading R Packages
+  * Stationarity
+  * Fitting an ARIMA model
+  * Decomposing Your Data
+  * Autocorrelations and Choosing Model Order
+    
+  
+2.[Naive Forecasting Method](https://www.pluralsight.com/guides/time-series-forecasting-using-r)
+
+The simplest forecasting method is to use the most recent observation as the forecast for the next observation. This is called a naive forecast and can be implemented using the 'naive()' function. This method may not be the best forecasting technique, but it often provides a useful benchmark for other, more advanced forecasting methods.
+
+3.[Simple Exponential Smoothing](https://www.pluralsight.com/guides/time-series-forecasting-using-r)
+
+Exponential Smoothing methods are an extension of the naive method, wherein the forecasts are produced using weighted averages of past observations, with the weights decaying exponentially as the observations get older.
+
+4.[Multiple Linear Regression](https://www.statisticssolutions.com/what-is-multiple-linear-regression/)
+
+The multiple linear regression is used to explain the relationship between one continuous dependent variable and two or more independent variables.  The independent variables can be continuous or categorical (dummy coded as appropriate.
+
+5.[TBATS Models](https://www.pluralsight.com/guides/time-series-forecasting-using-r)
+
+The TBATS model combines several components of the already discussed techniques in this guide, making them a very good choice for forecasting.
+
+
+
+
+
+
+

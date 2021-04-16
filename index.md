@@ -2,6 +2,6 @@
 
 [Homework 0](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW1.html)
 
-# Homework 1
+# Second Assignment
 
-[Homework 1](https://bu-ie-360.github.io/spring21-Umutdilsiz/Ie 360 HW1.html)
+[Homework 1](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW2.html)

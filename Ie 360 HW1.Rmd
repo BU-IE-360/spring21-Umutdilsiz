@@ -1,0 +1,166 @@
+---
+title: "Homework 1"
+author: "Umut Mustafa Dilsiz"
+date: "14 Nisan 2021"
+output: html_document
+---
+# Part 1
+
+
+```{r, message=FALSE,warning=FALSE}
+library(readxl)
+library(zoo)
+library(openxlsx)
+library(tidyverse)
+library(knitr)
+library(tinytex)
+library(gtrendsR)
+library(reshape2)
+library(ggplot2)
+```
+
+```{r}
+data360<-"C:\\Users\\MERVE\\Desktop\\"
+
+```
+
+
+## Residential Property Price Index (RPPI) Data of Turkey
+### Obtaining Data from EDDS
+
+Firs of all, I obtained data from Electronic Data Delivery System of TCMB to my computer. I read the data via read.table function.
+
+```{r}
+RPPI <- read_excel("C:\\Users\\MERVE\\Desktop\\data360\\RPPI.xlsx")
+
+RPPI %>% glimpse()
+```
+
+### Changing Types of Data
+
+I changed types of data thanks to transforrm function.
+
+```{r}
+RPPI<-transform(RPPI,RPPIV=as.numeric(RPPIV),Date=as.yearmon(Date))
+```
+
+
+### Plotting
+
+After creating data, I made a line chart of RPPI Data.
+
+```{r}
+
+ggplot(RPPI, aes(Date,RPPIV)) +
+  geom_line()+
+  geom_point()
+```
+
+### Analysis
+
+  In this graph we can see that, there is a lineer increasing trend.Between 2018 and 2019,Residential Property Price Index showed a decrease but continued to increase again.
+
+## House Saling Statistics(HSS) Data of Turkey
+
+### Obtaining Data
+
+```{r}
+HSS <- read_excel("C:\\Users\\MERVE\\Desktop\\data360\\HSS.xlsx")
+                      
+```
+### Changing Types of Data
+
+```{r}
+HSS<-transform(HSS,HSSV=as.numeric(HSSV),Date=as.yearmon(Date))
+```
+
+### Plotting
+
+After creating data, I made a line chart of HSS Data.
+
+```{r}
+ggplot(HSS, aes(Date,HSSV)) +
+  geom_line()+
+  geom_point()
+```
+
+
+### Analysis
+
+Accordingto this graph, House Saling Statistics showed the average increases and decreases between 2015 and 2019.There has been a clear increase in sales since the last quarter of 2019. There was an incredible decline in the first quarter of 2020. It may be possible to evaluate the reason for this as the spread of Covid 19 virus in our country.
+
+
+## House Unıt Prices(HUP) Data of Turkey
+
+### Obtaining Data
+
+```{r}
+HUP <- read_excel("C:\\Users\\MERVE\\Desktop\\data360\\HUP.xlsx")
+                      
+```
+### Changing Types of Data
+
+```{r}
+HUP<-transform(HUP,HUPV=as.numeric(HUPV),Date=as.yearmon(Date))
+```
+
+### Plotting
+
+After creating data, I made a line chart of HUP Data.
+
+```{r}
+ggplot(HUP, aes(Date,HUPV)) +
+  geom_line()+
+  geom_point()
+```
+
+
+### Analysis
+
+Square meter selling price of homes in Turkey, from 2015 until the end of 2019 linear increase was observed. Although a slight decrease was observed in the first four months of 2019, the increase continued more sharply in the following months.
+
+## Comparative Analysis
+
+
+Housing price index, which rose to buy a house for sale in Turkey covering the issue price and sell at a significant scale portion. When we evaluate the housing price index and the square meter sales prices of the houses in Turkey, we can see that the two are closely related to each other. When comparing the years of 2015 and 2021 on a monthly basis, we can see that the house price index leads the house sales prices.
+
+In addition, When we look at the fluctuations in the number of home sales in Turkey; It can be said that it is due to the increases in house sales and house price indices. In addition to this situation, some global problems affect these parameters.
+
+# Part 2
+
+I determined the keywords that I research.
+
+```{r,message=FALSE,warning=FALSE}
+keywords=c("Ev Satışı","Metrekare fiyat")
+```
+
+
+I defined the interval time of my observations.
+
+```{r,message=FALSE,warning=FALSE}
+time=("2015-01-01 2021-01-01")
+```
+
+ 
+
+```{r,message=FALSE,warning=FALSE}
+trends = gtrends(keywords, geo="TR", time = time )
+time_trend=trends$interest_over_time
+```
+
+I plotted trends.
+
+```{r}
+plot<-ggplot(data=time_trend, aes(x=date, y=hits, group=keyword, col=keyword))+
+        geom_line()+xlab('Time')+ylab('Relative Interest')+ theme_bw()+
+        theme(legend.title = element_blank(),legend.position="bottom",legend.text=element_text(size=14))+ggtitle("Google Search Volume")
+plot
+```
+
+## Comments for Trends
+
+When we look at our keywords "house sales" and "square meter price" trends, we can actually explain the relationship of the data we analyze."Houses for sale" When we look at the word trend graph with the total number of homes sold in Turkey, we can see the largely örtüşdüg. This shows that there is consistency between the searches people make and the events they take action.Although the search for "square meter price" in the Google search table has shown an increasing and decreasing trend, we can say that an increase has been observed from January 2015 to January 2021.It is not possible to say that this situation is completely related to the house price index in the country.
+
+
+
+

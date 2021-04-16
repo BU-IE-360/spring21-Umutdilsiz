@@ -1,7 +1,7 @@
-# First Assignment
+# Homework Zero
 
 [Homework 0](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW1.html)
 
-# Second Assignment
+# First Homework
 
 [Homework 1](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW2.html)

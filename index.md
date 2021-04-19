@@ -4,4 +4,4 @@
 
 # Homework First
 
-[Homework 1](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW2.html)
+[Homework 1](https://bu-ie-360.github.io/spring21-Umutdilsiz/Homework2.html)

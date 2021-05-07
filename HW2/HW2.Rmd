@@ -1,0 +1,220 @@
+---
+title: "Time Series Regression for Predicting Macroeconomic Indicator: Second Hand House Sale"
+author: "Umut Mustafa Dilsiz"
+date: "05 05 2021"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+	warning = FALSE)
+```
+
+
+
+# Introduction
+In this assignment, our aim is to develop and analyze a time series regression model to estimate the parameters that we will consider macroeconomically such as "Second hand home sales". We will use the different types of data we have to evaluate to create a valid and useful model. First of all, I would like to express that all the data we will use to express the situation clearly are taken from the Central Bank of the Republic of Turkey Electronic Data Distribution System: [EVDS] (https://evds2.tcmb.gov.tr/).
+To estimate the "second hand home purchase" index for April 2021; Previous "second hand home purchases", dollar exchange rates as prices are usually set in dollars, we can take survey questions to measure the impact of the economy on people. There are two different survey questions. The first of these measures the probability of buying a second-hand home in the next 12 months, the other measures the general economic situation expectation for the next 12 months. In the homework, each data will be analyzed and their connections with each other will be checked.
+
+
+```{r echo=FALSE, include=TRUE}
+#adding libraries
+library(ggplot2)
+library(dplyr)
+library(readxl)
+library(lubridate)
+library(data.table)
+library(ggcorrplot)
+library(GGally)
+library(corrplot)
+library(forecast)
+library(tidyverse)
+library(zoo)
+```
+
+```{r echo=FALSE, include=TRUE}
+
+#taking data
+
+data = read_xlsx("C:\\Users\\MERVE\\Desktop\\IE360\\All_data.xlsx")
+
+data = transform(data, Date=ymd(paste(Date,"-01",sep = "")), Exchange_Rate=as.numeric(Exchange_Rate), Prob_Buying_Home=as.numeric(Prob_Buying_Home), General_Economic_Expectation=as.numeric(General_Economic_Expectation), Second_Hand_Sale=as.numeric(Second_Hand_Sale), Interest_Rate=as.numeric(Interest_Rate))
+
+data %>% glimpse()
+
+```
+
+
+
+# Analysis of Second Hand Sale: Main Function
+Understanding of the main function, index of Second Hand Sale, plotting could be an option to reach a better point.
+
+```{r echo = FALSE, include = TRUE}
+ggplot(data, aes(x=Date, y=Second_Hand_Sale)) +
+  geom_line(size = 1, colour = "darkblue") +
+  labs(title = "Index for Second Hand Sale in between 2014-2021", x = "Date", y = "Index") +
+  theme(axis.text.x = element_text(angle = 40, size=8, hjust = 0.8))
+```
+
+As can be seen on the chart, it is not very easy to place a clear trend line. because there is an increasing and decreasing line. We can use the logarithm function to find a better trend.
+
+```{r echo = FALSE, include = TRUE}
+data$log.handsale = log(data$Second_Hand_Sale)
+
+ggplot(data, aes(x=Date, y=log.handsale)) +
+  geom_line(size = 1, colour = "darkblue") +
+  labs(title = "Index for Second Hand Sale in between 2014-2021", x = "Date", y = "log(Index)") +
+  theme(axis.text.x = element_text(angle = 40, size=8, hjust = 0.8))
+
+```
+
+Let's add trend lines to see which graphic will work better.
+
+```{r echo = FALSE, include = TRUE, out.width='50%'}
+
+
+regression<-lm(Second_Hand_Sale ~ Date, data = data)
+cff=coefficients(regression)
+
+equal = paste0("y = ", round(cff[2],1), "*x ", round(cff[1],1))
+
+plot(data$Date, data$Second_Hand_Sale,xlab='Date',ylab='Index', main='Index for Second Hand Sale in between 2014-2021')
+
+abline(regression, col="darkblue")
+
+regression1<-lm(log.handsale ~ Date, data = data)
+cff=coefficients(regression1)
+ 
+equal = paste0("y = ", round(cff[2],1), "*x ", round(cff[1],1))
+# plot
+plot(data$Date, data$log.handsale,xlab='Date',ylab='Logarithm of Index', main='Logarithm of Index for Second Hand Sale in between 2014-2021')
+abline(regression1, col="darkblue")
+```
+
+Since the trend line is closer in the logarithm chart than in the normal chart, it is more accurate to base it. It is not correct to say that the logarithm plot is definitely better, as other types of trends can affect our prediction model. However, it is more likely to be predictable. As a result of trend lines graphs, it seems better to create a forecast model in the logarithm version.
+
+
+
+# Analyses of All Variables
+
+First of all, it is necessary to specify the relationships of the data we use. Exchange rates are one of the factors that affect the buying and selling power in the country. An increase in the exchange rate means that it may lead to a decrease in purchasing power. Interest rates are another factor that shows the strength of the country's economy. Other data include two different survey results. In the second hand home buying survey, "What are your chances of buying a second hand home in the next 12 months?" We can find the answer to the question. In the other survey, "What are your expectations for the general economic situation in the next 12 months? We can reach the answers to the question.
+Let's evaluate on the same graph to see if there are significant similarities between the data. Since the values ​​of some data are high, a certain amount of reduction has been made.
+
+```{r echo = FALSE, include = TRUE}
+ggplot(data, aes(x=Date)) +
+  geom_line(aes(y=Second_Hand_Sale/10, color= "Index - Second Hand House Sale/10"), size=1)+
+  geom_line(aes(y=log.handsale, color= "Log Index - Second Hand House Sale"), size=1)+
+  geom_line(aes(y=Exchange_Rate, color = "Exchange Rate"), size=1)+
+  geom_line(aes(y=Interest_Rate/2, color = "Interest Rate/2"), size=1)+
+  geom_line(aes(y=General_Economic_Expectation/10, color = "Survey General_Economic_Expaectation/10"), size=1)+
+  geom_line(aes(y=Prob_Buying_Home, color = "Survey Probability Buying Home"), size=1)+
+  theme(axis.text.x = element_text(angle = 45))+
+  labs(x="Date",y=" ", title="All Variables in between 2014-2021")+
+  theme_minimal()
+
+```
+
+
+```{r echo = FALSE, include = TRUE}
+
+corredata=data[,4]
+corredata = data.frame(corredata)
+names(corredata)[names(corredata) == "corredata"] <- "Second_Hand_Sale"
+corredata$log_sc = data$log.handsale
+corredata$Dollar = data$Exchange_Rate
+corredata$Prob_buying = data$Prob_Buying_Home
+corredata$General_eco = data$General_Economic_Expectation
+corredata$IntRate = data$Interest_Rate
+ggpairs(corredata)
+```
+
+In this part, the correlation between second-hand home purchasing and other variables and the correlation between the logarithm of second-hand home purchasing and other variables were compared. It would make sense to go with the logarithm option to generate a good estimate.
+
+
+
+# Forecasting Model
+
+
+After deciding to create a model over the logarithm of the previous CPI's: Purchase of Vehicles, the USD with 0.98, situation survey with -0.66 and interest rate with 0.6 correlations will be used in the first forecasting model.
+
+```{r echo = TRUE, include = TRUE}
+corredata=data.table(corredata)
+Fr=lm( log_sc ~ Dollar + Prob_buying + General_eco + IntRate, corredata)
+summary(Fr)
+checkresiduals(Fr)
+```
+
+#Residuals for Fitted Value
+
+```{r echo = FALSE, include = TRUE}
+predata = corredata
+predata[,fitted:=fitted(Fr)]
+predata[,residual:=residuals(Fr)]
+predata %>%
+  ggplot(aes(x=fitted, y=residual)) + 
+  geom_point(color="Blue") +
+  labs(title="Residuals for each Fitted Value", x="Fitted",y="Residuals")+
+  geom_abline(slope=0, intercept=0)
+```
+
+#Actual & Fitted Value
+
+```{r echo = FALSE, include = TRUE}
+predata %>%
+  ggplot(aes(x=fitted, y=log_sc)) + 
+  geom_point(color="red") +
+  labs(title="Actual vs Fitted Values", x="Fitted",y="Actual")+
+  geom_abline(slope=1, intercept=0)
+```
+
+When we observe the graph, it seems possible that it can be compared with the real index.
+
+
+# Plotting the Forecast Model
+
+
+```{r echo=FALSE, include=TRUE}
+corredata$Date = data$Date[1:86]
+predata$Date = corredata$Date
+predata[,fitted:=corredata$fitted]
+ggplot(predata ,aes(x=Date)) + 
+  geom_line(aes(x = Date, y = fitted, color = "Forecast"), size=1) +
+  geom_line(aes(x = Date, y = log_sc, color = "Actual"), size=1) +
+  labs(title = "Forecast vs Actual", x = "Time", y = "LogIndex for Second Hand House Sale", color=" ") +
+  theme_minimal() +
+  scale_color_manual(values=c("orange", "purple"))
+```
+
+# Forecasting(Next Month):April 2021
+
+
+```{r echo=FALSE, include=TRUE}
+predata=rbind(predata,data.table(Date=ymd("2021-04-01")),fill=T) 
+predata[is.na(General_eco)==T,General_eco:= data[86,4]]
+predata[is.na(Dollar)==T,Dollar:= data[86,2]]
+predata[is.na(IntRate)==T,IntRate:= data[86,6]]
+predata[is.na(Prob_buying)==T, Prob_buying:=data[86,3]]
+predata[is.na(fitted)==T,fitted:= 86]
+expected = predict(Fr, predata[is.na(log_sc)==T])
+pred4.21 = exp(expected)
+predata[is.na(Second_Hand_Sale)==T,Second_Hand_Sale:= pred4.21]
+predata[is.na(log_sc)==T,log_sc:= expected]
+
+```
+
+```{r echo=TRUE, include=TRUE}
+pred4.21
+```
+
+# Conclusion
+
+In this study, second hand house sales data were taken as a source from [https://evds2.tcmb.gov.tr/].
+First, we analyzed the data and observed its trend over time. In order to define the prediction model more accurately, the logarithm of the data was generated and used in subsequent calculations. In addition to this situation, the necessary parameters for the decision model were determined by evaluating the correlations of the data we received.
+Then, the trend variable and the model were revised.
+
+In the last model we obtained, we reached a good graphic showing the integrity of the model. In the last stage, we plotted the actual and predicted values to observe the adequacy of the model. The estimate of April 2021 is 142,8098.  
+  
+
+

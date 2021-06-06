@@ -8,3 +8,6 @@
 
 # Second Homework
 [Homework 2](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW2/Homeworkk2.html)
+
+#Third Homework
+[Homework 3](https://bu-ie-360.github.io/spring21-Umutdilsiz/hw3/Hw3.html)

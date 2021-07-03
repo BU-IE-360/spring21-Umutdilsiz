@@ -14,3 +14,6 @@
 
 # Term Project
 [Project](https://bu-ie-360.github.io/spring21-Umutdilsiz/IE360Project/IE360-Proje.html)
+
+# Homework4&5
+[Hw4&5](https://bu-ie-360.github.io/spring21-Umutdilsiz/HW4&5/Homework4&5.html)
